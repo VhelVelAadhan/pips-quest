@@ -1,6 +1,13 @@
 # Local build outputs for drag-and-drop hosts (GitHub Pages uses docs/)
 dist/
+pips-quest/
 *.zip
 
 # Local editor / tool settings
 .claude/
+
+# Marketing studio tools (reinstall with npm install)
+marketing/studio/node_modules/
+
+# claude.ai Artifact build output (node tools/build-artifact.js)
+artifact/

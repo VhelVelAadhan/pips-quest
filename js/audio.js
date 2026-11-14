@@ -26,7 +26,7 @@ const Sound = (() => {
 
   function tone(freq, dur, type = 'square', vol = 0.3, slideTo = 0, delay = 0, bus = sfxBus) {
     if (!ctx) return;
-    const t = ctx.currentTime + delay;
+    const t = ctx.currentTime + tOff + delay;
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type;
     o.frequency.setValueAtTime(freq, t);
@@ -40,7 +40,7 @@ const Sound = (() => {
 
   function noise(dur, vol = 0.3, freq = 1200, delay = 0) {
     if (!ctx) return;
-    const t = ctx.currentTime + delay;
+    const t = ctx.currentTime + tOff + delay;
     const s = ctx.createBufferSource(); s.buffer = noiseBuf;
     const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq;
     const g = ctx.createGain();
@@ -181,5 +181,43 @@ const Sound = (() => {
     }
   }
 
-  return { init, play, music, stopMusic, toggleMute, get muted() { return muted; }, get song() { return current; } };
+  // ---------- Offline rendering (used to make trailer soundtracks) ----------
+  // parts: [{ name, start, end }] songs in seconds; events: [[seconds, sfxName], ...]
+  let tOff = 0;
+  function renderOffline(parts, seconds, events = [], rate = 48000) {
+    const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const saved = [ctx, master, sfxBus, musBus, noiseBuf];
+    const off = new OAC(2, Math.ceil(seconds * rate), rate);
+    ctx = off;
+    master = off.createGain(); master.connect(off.destination);
+    master.gain.setValueAtTime(0.55, 0);
+    master.gain.setValueAtTime(0.55, Math.max(0, seconds - 1.2));
+    master.gain.linearRampToValueAtTime(0.0001, seconds);
+    sfxBus = off.createGain(); sfxBus.gain.value = 0.55; sfxBus.connect(master);
+    musBus = off.createGain(); musBus.gain.value = 0.22; musBus.connect(master);
+    noiseBuf = off.createBuffer(1, Math.floor(rate * 0.6), rate);
+    const nd = noiseBuf.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    try {
+      for (const part of parts) {
+        const song = parsed[part.name];
+        if (!song) continue;
+        const stepDur = 60 / song.bpm / 2;
+        for (let step = 0, t = part.start; t < part.end - 0.02; step++, t += stepDur) {
+          const li = step % song.lead.length, bi = step % song.bass.length;
+          const ln = song.lead[li], bn = song.bass[bi];
+          const clip = d => Math.max(0.03, Math.min(d, part.end - t));
+          if (ln && ln !== '_') scheduleNote(ln, t, clip(stepDur * voiceLen(song.lead, li) * 0.95), 'square', 0.35);
+          if (bn && bn !== '_') scheduleNote(bn, t, clip(stepDur * voiceLen(song.bass, bi) * 0.9), 'triangle', 0.6);
+        }
+      }
+      for (const [time, name] of events) if (SFX[name] && time < seconds) { tOff = time; SFX[name](); }
+    } finally {
+      tOff = 0;
+      [ctx, master, sfxBus, musBus, noiseBuf] = saved;
+    }
+    return off.startRendering();
+  }
+
+  return { init, play, music, stopMusic, toggleMute, renderOffline, get muted() { return muted; }, get song() { return current; } };
 })();

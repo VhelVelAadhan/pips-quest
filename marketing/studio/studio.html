@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pip's Quest Studio</title>
+</head>
+<body style="margin:0;background:#111">
+<!-- Hidden copy of the game; the studio steps it frame by frame and composites its canvas. -->
+<canvas id="game" style="display:none"></canvas>
+<div id="touch" style="display:none">
+  <button class="pad" data-k="left"></button><button class="pad" data-k="right"></button>
+  <button class="pad" data-k="down"></button><button class="pad" data-k="run"></button><button class="pad" data-k="jump"></button>
+  <button id="t-mute"></button><button id="t-fs"></button><button id="t-pause"></button>
+</div>
+<script>
+  // Repeatable randomness, and no real-time loop: the studio advances the game itself.
+  (function () {
+    let seed = 1;
+    window.__reseed = s => { seed = s >>> 0; };
+    Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  })();
+  window.requestAnimationFrame = () => 0;
+</script>
+<script src="/js/audio.js"></script>
+<script src="/js/sprites.js"></script>
+<script src="/js/levels.js"></script>
+<script src="/js/entities.js"></script>
+<script src="/js/game.js"></script>
+<script src="studio.js"></script>
+</body>
+</html>

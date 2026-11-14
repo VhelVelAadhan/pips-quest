@@ -79,7 +79,11 @@ function icon(size, withScene) {
 }
 
 // ---------- build ----------
-fs.rmSync(dist, { recursive: true, force: true });
+// Clear the old build but keep host link folders (e.g. .vercel, which tells the Vercel CLI which project to update).
+const KEEP = new Set(['.vercel', '.netlify', '.gitignore']);
+if (fs.existsSync(dist)) {
+  for (const f of fs.readdirSync(dist)) if (!KEEP.has(f)) fs.rmSync(path.join(dist, f), { recursive: true, force: true });
+}
 for (const d of ['js', 'css', 'icons']) fs.mkdirSync(path.join(dist, d), { recursive: true });
 for (const f of fs.readdirSync(path.join(root, 'js'))) fs.copyFileSync(path.join(root, 'js', f), path.join(dist, 'js', f));
 fs.copyFileSync(path.join(root, 'css', 'game.css'), path.join(dist, 'css', 'game.css'));
@@ -120,6 +124,16 @@ fs.writeFileSync(path.join(dist, '_headers'), [
   '/index.html', '  Cache-Control: no-cache', '/', '  Cache-Control: no-cache',
   '/manifest.webmanifest', '  Content-Type: application/manifest+json', '',
 ].join('\n'));
+
+// Vercel: same caching rule as _headers (fresh HTML; scripts are cache-busted by ?v=).
+fs.writeFileSync(path.join(dist, 'vercel.json'), JSON.stringify({
+  cleanUrls: true,
+  headers: [
+    { source: '/', headers: [{ key: 'Cache-Control', value: 'no-cache' }] },
+    { source: '/index.html', headers: [{ key: 'Cache-Control', value: 'no-cache' }] },
+    { source: '/manifest.webmanifest', headers: [{ key: 'Content-Type', value: 'application/manifest+json' }] },
+  ],
+}, null, 2));
 
 // GitHub Pages: serve files as-is (no Jekyll processing).
 fs.writeFileSync(path.join(dist, '.nojekyll'), '');

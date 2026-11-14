@@ -1,0 +1,17 @@
+{
+  "name": "pips-quest-studio",
+  "private": true,
+  "description": "Renders social media posters and trailer videos for Pip's Quest from the real game code.",
+  "scripts": {
+    "render": "node render.js",
+    "posters": "node render.js posters",
+    "videos": "node render.js videos"
+  },
+  "allowScripts": {
+    "ffmpeg-static": true
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "puppeteer-core": "^25.17.0"
+  }
+}
