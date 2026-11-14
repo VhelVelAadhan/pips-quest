@@ -1,0 +1,6 @@
+# Local build outputs for drag-and-drop hosts (GitHub Pages uses docs/)
+dist/
+*.zip
+
+# Local editor / tool settings
+.claude/

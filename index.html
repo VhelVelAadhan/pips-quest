@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pip's Quest">
+<title>Pip's Quest</title>
+<link rel="stylesheet" href="css/game.css?v=8">
+</head>
+<body>
+<canvas id="game" tabindex="0" aria-label="Pip's Quest game screen"></canvas>
+<p id="rotate-hint">Turn your phone sideways for a bigger screen</p>
+<div id="touch">
+  <button class="pad" id="t-left" data-k="left" aria-label="Move left">&#9664;</button>
+  <button class="pad" id="t-right" data-k="right" aria-label="Move right">&#9654;</button>
+  <button class="pad" id="t-down" data-k="down" aria-label="Crouch">&#9660;</button>
+  <button class="pad" id="t-run" data-k="run" aria-label="Fire">B</button>
+  <button class="pad" id="t-jump" data-k="jump" aria-label="Jump">A</button>
+  <div id="t-top">
+    <button id="t-mute" aria-label="Mute or unmute sound">&#9834;</button>
+    <button id="t-fs" aria-label="Fullscreen">&#9974;</button>
+    <button id="t-pause" aria-label="Pause">II</button>
+  </div>
+</div>
+<script src="js/audio.js?v=8"></script>
+<script src="js/sprites.js?v=8"></script>
+<script src="js/levels.js?v=8"></script>
+<script src="js/entities.js?v=8"></script>
+<script src="js/game.js?v=8"></script>
+</body>
+</html>

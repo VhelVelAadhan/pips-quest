@@ -1,0 +1,85 @@
+/* Arcade screen: one deliberate dark look, letterboxed canvas, translucent thumb pads. */
+:root {
+  --bg: #000000;
+  --pad: rgba(255, 255, 255, 0.14);
+  --pad-on: rgba(255, 255, 255, 0.42);
+  --pad-edge: rgba(255, 255, 255, 0.5);
+  --ink: rgba(255, 255, 255, 0.92);
+  --hint: #ffd9a8;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; outline: none; }
+
+#rotate-hint {
+  display: none;
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding-inline: 16px;
+  text-align: center;
+  font: 600 13px/1.4 var(--mono);
+  color: var(--hint);
+}
+@media (orientation: portrait) { body.touch #rotate-hint { display: block; } }
+
+#touch { display: none; position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+body.touch #touch { display: block; }
+#touch button {
+  pointer-events: auto;
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border: 2px solid var(--pad-edge);
+  border-radius: 50%;
+  background: var(--pad);
+  color: var(--ink);
+  font: 700 20px/1 var(--mono);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#touch button.on { background: var(--pad-on); transform: scale(0.94); }
+#touch button:focus-visible { outline: 2px solid var(--hint); outline-offset: 2px; }
+#t-left  { left: calc(14px + env(safe-area-inset-left, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+#t-right { left: calc(96px + env(safe-area-inset-left, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+#t-down  { left: calc(64px + env(safe-area-inset-left, 0px)); bottom: calc(98px + env(safe-area-inset-bottom, 0px)); width: 50px !important; height: 50px !important; font-size: 15px !important; }
+/* A and B sit above the bottom-right corner, which hosting badges (e.g. Netlify's) can cover. */
+#t-jump  { right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(104px + env(safe-area-inset-bottom, 0px)); width: 78px !important; height: 78px !important; font-size: 24px !important; }
+#t-run   { right: calc(100px + env(safe-area-inset-right, 0px)); bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+#t-top {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+#t-top button { position: static; width: 42px; height: 42px; border-radius: 10px; font-size: 16px; }
+/* Sideways, the HUD runs along the top edge, so the small buttons sit between the thumb pads. */
+@media (orientation: landscape) {
+  #t-top { top: auto; right: auto; left: 50%; transform: translateX(-50%); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  #t-top button { width: 38px; height: 38px; opacity: 0.8; }
+}
+@media (prefers-reduced-motion: reduce) { #touch button.on { transform: none; } }
